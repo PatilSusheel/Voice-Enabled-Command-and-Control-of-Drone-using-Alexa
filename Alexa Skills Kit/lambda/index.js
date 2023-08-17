@@ -12,11 +12,11 @@ const LaunchRequestHandler = {
   },
   async handle(handlerInput) {
     let doc = {
-        "id" : handlerInput.requestEnvelope.request.timestamp,
+        "Time Stamp" : handlerInput.requestEnvelope.request.timestamp,
         "command" : "Launch Voice Pilot"
     };
     
-    const resp = await wsSend({'action':'broadcast','body':{'type':'launch'}});
+    const resp = await wsSend({'action':'pathAPI','body':{'type':'launch'}});
     let STATUS = resp.STATUS, mode = resp.mode;
     dbLog(doc);
     
@@ -40,7 +40,7 @@ const TakeoffHandler = {
      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'takeoff';
   },
   async handle(handlerInput){
-    const resp = await wsSend({'action':'broadcast',
+    const resp = await wsSend({'action':'pathAPI',
     'body':{
       'type': 'takeoff'
       }
@@ -73,12 +73,12 @@ const FlyHandler = {
     let cmd = `${verb} ${dir} ${dist || ""}`;
     
     let doc = {
-        "id" : handlerInput.requestEnvelope.request.timestamp,
+        "Time Stamp" : handlerInput.requestEnvelope.request.timestamp,
         "command" : cmd
     };
     dbLog(doc);
     
-    const resp = await wsSend({'action':'broadcast',
+    const resp = await wsSend({'action':'pathAPI',
     'body':{
       'type': 'fly',
       'verb': verb,
@@ -109,7 +109,7 @@ const StatusHandler = {
      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'status';
   },
   async handle(handlerInput){
-    const resp = await wsSend({'action':'broadcast','body':{'type':'status'}});
+    const resp = await wsSend({'action':'pathAPI','body':{'type':'status'}});
     let STATUS = resp.STATUS, mode = resp.mode, dist = resp.homeDist, output;
     switch (STATUS){
       case 0: output=`drone is flying to target in ${mode} mode`;
@@ -138,11 +138,11 @@ const RtlHandler = {
   },
   async handle(handlerInput){
     let doc = {
-        "id" : handlerInput.requestEnvelope.request.timestamp,
+        "Time Stamp" : handlerInput.requestEnvelope.request.timestamp,
         "command" : "RTL command"
     };
     
-    const resp = await wsSend({'action':'broadcast','body':{'type':'rtl'}});
+    const resp = await wsSend({'action':'pathAPI','body':{'type':'rtl'}});
     dbLog(doc);
     
     let STATUS = resp.STATUS , output;
@@ -219,7 +219,7 @@ const ErrorHandler = {
 // source : aws amplify docs for using dynamoDB
 const dbLog = async (doc)=>{
   const params = {
-    TableName : process.env.TABLE,
+    TableName : "droneTable",
     Item: doc,
     };
     // Insert to DB
@@ -232,7 +232,7 @@ const dbLog = async (doc)=>{
 
 const wsSend = doc=>{
   return new Promise((resolve,reject)=>{
-    const ws = new WebSocket('wss://32226u87yi.execute-api.eu-west-1.amazonaws.com/test_experiment');
+    const ws = new WebSocket('wss://aw341w2uk9.execute-api.ap-south-1.amazonaws.com/production');
     ws.onmessage = function (msg) {
       let body = msg.data;
       console.log('wsreceived: %s', body);
