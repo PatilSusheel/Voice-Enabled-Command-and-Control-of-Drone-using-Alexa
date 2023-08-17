@@ -60,7 +60,7 @@ async def conn():
                 
                     
                 # Sending status and other necessary details from GCS to Alexa
-                doc = {"action": "broadcast", "STATUS": STATUS}
+                doc = {"action": "pathAPI", "STATUS": STATUS}
                 if(type in ['status','launch','takeoff']): doc['mode'] = vehicle.mode.name
                 if(type=='status' and STATUS>0):
                     doc['homeDist'] = calcDistToHome(vehicle)
